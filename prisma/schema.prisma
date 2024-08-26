@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Gacha {
+    id        Int         @default(autoincrement())
+    gachaType Int         @map("gacha_type") @db.SmallInt
+    items     GachaItem[]
+
+    @@id([id])
+    @@map("gacha")
+}
+
+model GachaItem {
+    id         Int        @default(autoincrement())
+    gachaId    Int        @map("gacha_id")
+    itemId     String     @map("item_id") @db.VarChar(255)
+    itemRarity ItemRarity @map("item_rarity")
+    itemType   ItemType   @map("item_type")
+    iconUrl    String     @default("https://example.com/icon.png") @map("icon_url") @db.Text()
+    title      String     @default("title") @db.VarChar(255)
+    dropRate   Float      @map("drop_rate")
+
+    Gacha Gacha @relation(fields: [gachaId], references: [id], onDelete: Restrict)
+
+    @@id([id])
+    @@map("gacha_id")
+}
+
+enum ItemRarity {
+    LEGENDARY
+    RARE
+    EPIC
+    UNCOMMON
+    COMMON
+}
+
+enum ItemType {
+    CURRENCY
+    WEAPON
+}
+
